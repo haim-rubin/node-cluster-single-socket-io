@@ -3,6 +3,9 @@ import logo from './logo.svg';
 import './App.css';
 
 class App extends Component {
+  state = {
+    count: 0
+  }
   render() {
     const { socket } = this.props
     return (
@@ -17,12 +20,9 @@ class App extends Component {
               <button onClick={
                 (event) =>{
                   event.stopPropagation()
-                  fetch('/api/haim')
-                  .then(res=>res.json())
-                  .then(d =>{
-                    console.log(d)
-                  })
-                  socket.emit('data', {Data: 'Any ....'})
+
+                  socket.emit('data', {Data: `Any ${this.state.count}....`})
+                  this.setState({ count: this.state.count + 1 })
 
                 }
               }>

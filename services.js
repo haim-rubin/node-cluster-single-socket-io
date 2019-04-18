@@ -1,28 +1,12 @@
 const express = require('express')
 const http = require ('http')
 const socketIO = require('socket.io')
-const ioClient = require('socket.io-client');
-const getSocketClient = ({ host }) => {
-  const socket = ioClient.connect(host, { reconnect: true })
 
-  // Add a connect listener
-  socket.on('connect', function(socket) {
-      console.log(`${host} - Connected!`)
-  })
-
-  return socket
-}
-
-const getServer = ({ name, port, services }) =>{
+const getServer = ({ name, port }) =>{
 
   const app = express()
   const server = http.createServer(app)
   const ioServer = socketIO.listen(server)
-
-  const sockets =
-    services.map( ({ host }) =>
-      getSocketClient({ host })
-    )
 
   ioServer.on('connection', function(socket) {
     const onevent  = socket.onevent;
@@ -40,25 +24,18 @@ const getServer = ({ name, port, services }) =>{
     }
 
     socket.on('*', function(event,data) {
-      sockets.forEach(socket => {
-        socket.emit(event, data)
-      })
       console.log(`event => ${event}`, data)
     })
-
-    sockets.forEach(csocket => {
-      csocket.on('DateTime', (data) => {
-        console.log(data)
-      })
-    })
+    setInterval(() => {
+      socket.emit('DateTime', `port: ${port} - ${new Date()}`)
+    }, 3000)
   })
 
   server.listen(port, () =>{
     console.log(`Server ${name} listen on port: ${port}`)
   })
 }
-const services = [
-  {host: 'http://localhost:6001'},
-  {host: 'http://localhost:6002'}
-]
-getServer({ name: 'S1', port: 5555, services })
+
+
+getServer({ name: 'S2', port: 6001 })
+getServer({ name: 'S3', port: 6002 })
