@@ -46,10 +46,12 @@ const getServer = ({ name, port, services }) =>{
       console.log(`event => ${event}`, data)
     })
 
-    sockets.forEach(csocket => {
-      csocket.on('DateTime', (data) => {
-        console.log(data)
-      })
+
+  })
+
+  sockets.forEach(csocket => {
+    csocket.on('DateTime', (data) => {
+      console.log(data)
     })
   })
 
