@@ -27,8 +27,8 @@ const getServer = ({ name, port }) =>{
       console.log(`event => ${event}`, data)
     })
     setInterval(() => {
-      socket.emit('DateTime', `port: ${port} - ${new Date()}`)
-    }, 3000)
+      socket.emit('DateTime', ` ${name} - port: ${port} - ${new Date()}`)
+    }, 100)
   })
 
   server.listen(port, () =>{
@@ -36,6 +36,4 @@ const getServer = ({ name, port }) =>{
   })
 }
 
-
-getServer({ name: 'S2', port: 6001 })
-getServer({ name: 'S3', port: 6002 })
+module.exports = getServer

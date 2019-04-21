@@ -9,6 +9,19 @@ const getSocketClient = ({ host }) => {
   socket.on('connect', function(socket) {
       console.log(`${host} - Connected!`)
   })
+  const onevent  = socket.onevent;
+  socket.onevent = function( package ) {
+
+    // New package with '*' as all events
+    const newPackage = {
+      ...package,
+      data: ["*"].concat(package.data)
+    }
+
+    // Additional call to catch-all
+    onevent.call(this, newPackage)
+
+  }
 
   return socket
 }
@@ -24,7 +37,10 @@ const getServer = ({ name, port, services }) =>{
       getSocketClient({ host })
     )
 
+  const cSockets = []
+
   ioServer.on('connection', function(socket) {
+    cSockets.push(socket)
     const onevent  = socket.onevent;
     socket.onevent = function( package ) {
 
@@ -50,8 +66,11 @@ const getServer = ({ name, port, services }) =>{
   })
 
   sockets.forEach(csocket => {
-    csocket.on('DateTime', (data) => {
-      console.log(data)
+    csocket.on('*', (event, data) => {
+      console.log(`${csocket.id} - Event: ${event}`)
+      cSockets.forEach(csocket => {
+        csocket.emit(event, data)
+      })
     })
   })
 
@@ -61,6 +80,7 @@ const getServer = ({ name, port, services }) =>{
 }
 const services = [
   {host: 'http://localhost:6001'},
-  {host: 'http://localhost:6002'}
+  {host: 'http://localhost:6002'},
+  {host: 'http://localhost:6003'}
 ]
 getServer({ name: 'S1', port: 5555, services })
